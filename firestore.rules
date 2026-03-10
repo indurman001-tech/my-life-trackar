@@ -1,0 +1,37 @@
+// ════════════════════════════════════════════
+// FIREBASE FIRESTORE SECURITY RULES
+// Paste this in Firebase Console → Firestore → Rules
+// ════════════════════════════════════════════
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── USERS: only the owner can read/write their own doc ──
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // History sub-collection
+      match /history/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // ── PAYMENTS: any logged-in user can create, only they can read theirs ──
+    match /payments/{payId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update, delete: if false; // admin only via Firebase Console
+    }
+
+    // ── VAULT (brand context) ──
+    match /vault/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ── Deny everything else ──
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
