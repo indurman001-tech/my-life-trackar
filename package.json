@@ -1,8 +1,0 @@
-{
-  "name": "signup-app",
-  "version": "1.0.0",
-  "description": "Signup form with Supabase — API key hidden via Vercel serverless",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
-  }
-}
